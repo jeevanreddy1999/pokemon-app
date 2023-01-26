@@ -1,19 +1,20 @@
 import { Fragment } from "react";
-import Error from "next/error";
 import Head from "next/head";
-import Image from "next/image";
 import Layout from "@/components/Layout";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { Pokemon } from "pokenode-ts";
 
 interface Props {
-  errorCode: never;
-  pokemon: Pokemon;
+  pokemon: Pokemon | undefined;
 }
 
-const PokemonDetails: NextPage<Props> = ({ errorCode, pokemon }) => {
-  if (errorCode) {
-    return <Error statusCode={errorCode} />;
+const PokemonDetails: NextPage<Props> = ({ pokemon }) => {
+  if (!pokemon) {
+    return (
+      <Layout>
+        <div>error</div>
+      </Layout>
+    );
   }
   return (
     <Fragment>
@@ -34,18 +35,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { name }: any = context.params;
 
   const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
-  if (res.ok) {
-    const pokemon = await res.json();
+  if (!res.ok)
     return {
-      props: { errorCode: false, pokemon },
+      props: { pokemon: null },
     };
-  } else {
-    return {
-      props: {
-        errorCode: res.status,
-      },
-    };
-  }
+  const data = await res.json();
+  return {
+    props: { pokemon: data },
+  };
 }
 
 export default PokemonDetails;

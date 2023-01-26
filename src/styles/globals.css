@@ -70,7 +70,7 @@ input[type="checkbox"] {
   transition: 300ms;
 
   &:hover {
-    color: inherit;
+    color: white;
     text-decoration: none;
     transform: scale(1.05);
   }
